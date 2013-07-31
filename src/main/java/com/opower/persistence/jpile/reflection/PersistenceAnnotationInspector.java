@@ -272,7 +272,7 @@ public class PersistenceAnnotationInspector {
     public <A extends Annotation> List<AnnotatedMethod<A>> annotatedMethodsWith(Class<?> aClass, Class<A> annotation) {
         List<AnnotatedMethod<A>> methods = newArrayList();
         for (Method m : ReflectionUtils.getAllDeclaredMethods(aClass)) {
-            A a = findAnnotation(m, annotation);
+            A a = m.getAnnotation(annotation);
             if (a != null) {
                 methods.add(new AnnotatedMethod<A>(m, a));
             }

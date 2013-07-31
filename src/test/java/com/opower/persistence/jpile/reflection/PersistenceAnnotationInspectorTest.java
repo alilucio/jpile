@@ -8,6 +8,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTables;
 import javax.persistence.Table;
+
 import com.opower.persistence.jpile.sample.Contact;
 import com.opower.persistence.jpile.sample.Customer;
 import com.opower.persistence.jpile.sample.Product;
@@ -79,6 +80,32 @@ public class PersistenceAnnotationInspectorTest {
         for (PersistenceAnnotationInspector.AnnotatedMethod<Column> methodWithAnnotations : methods) {
             assertNotNull("Must have @Column", methodWithAnnotations.getMethod().getAnnotation(Column.class));
         }
+    }
+
+    /** A test interface. */
+    interface TestBaseClass {
+        Number getValue();
+    }
+
+    /**
+     * Verify that the actual method that has the {@link Column} annotation is used, and not some other method signature.
+     */
+    @Test
+    public void testMethodsAnnotatedWithInheritance() throws Exception {
+        /** A test class. */
+        class TestClass implements TestBaseClass {
+            @Column
+            @Override
+            public Integer getValue() {
+                return null;
+            }
+        }
+
+        List<PersistenceAnnotationInspector.AnnotatedMethod<Column>> methods =
+                annotationInspector.annotatedMethodsWith(TestClass.class, Column.class);
+        assertEquals("Number of found methods", 1, methods.size());
+        assertEquals("Found method", TestClass.class.getMethod("getValue"), methods.get(0).getMethod());
+        assertNotNull("Column annotation on method", methods.get(0).getMethod().getAnnotation(Column.class));
     }
 
     @Test
